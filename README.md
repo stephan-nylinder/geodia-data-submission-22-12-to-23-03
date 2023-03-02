@@ -35,14 +35,14 @@ Resarchers created account in ENA and registered project and study on 2022-12-05
 
 Data Steward decided to begin submission with the PacBio RSII sequel reads. Single file, small file size.
 
-  - Submission to be done using the ENA webin-cli client due to the various file formats in the projects. Keeping all submissions to a single solution makes trouble shooting easier.
+  - Submission to be done using the ENA webin-cli client due to the various file formats in the projects. Keeping all submissions to a single solution makes trouble shooting easier. Further, the client java executable, e.g. `webin-cli-6.1.0.jar` was not installed and put in PATH, but was kept in the active submission folder and executed in the Terminal in the respective folder.
   - Researchers provided DS with access to project folder at UPPMAX, for brokering purposes.
   - DS provided with paths to respective files
 > Note: The file tree was rather complex and not easy to navigate. Printed a tree topology to store locally on laptop to facilitate orientation
 
 # 4. Locus tags
 
-To prepare the data for submission proper locus tags had to be decided. After consultation the researchers decided on the abbreviation GBAR for the species under study (Geodia barretti). With the locus tag decided the conversion of .GFF to .EMBL could be made using emblmygff3.
+To prepare the assembly data for submission, proper locus tags had to be decided. After consultation the researchers decided on the abbreviation GBAR for the species under study (Geodia BARretti). The locus tag is essential to perform the conversion of .GFF to .EMBL using emblmygff3 later on.
 
 # 5. Raw data submissions to ENA
 
@@ -154,11 +154,128 @@ Two assemblies were scheduled:
   - Annotated nuclear genome (made by Bioinfomraticians at NBIS)
   - Annotated mitochondrial genome (made by researchers in the software Geneious, based on data provided by NBIS Bioinformaticians)
 
-As ENA does not (Early spring 2023) accept .GFF files for annotations a conversion to the EMBL flat file format was made using the emblmygff3 application (REF). The NBIS Bioinformaticians provided  
+As ENA does not (Early spring 2023) accept .GFF files for annotations a conversion to the EMBL flat file format was made using the emblmygff3 application (REF). The NBIS Bioinformaticians provided file paths to the proper .GFF files prepared for ENA submissions.
 
+> Note: The file tree in the project folder on UPPMAX contained multiple .GFF files with various names. Crucial for the project that responsible Bioinformaticians not only pointed out the correct files with paths, but also labelled the files accordingly.
+
+## 6.1 .GFF to .EMBL conversion
+
+For conversions to .EMBL flat file format the application requires two files:
+
+  - A .GFF file
+  - The corresponding .FASTA file
+
+> Note: The .FASTA file header needs to correspond to the label on the .EMBL `AC * ` line.
 
 Conversion was done using the command line:
 `EMBLmyGFF3 -i GBAR -p [ENA project] -r 1 -s 'Geodia barretti' -t linear -m 'genomic DNA' [input ENA gff file].gff [fastq file].fa -o [output file].embl`
 
-The resulting EMBL flat file was 
+THe resulting .EMBL flat file was then zipped as above. 
 
+## 6.2 The manifest file
+
+A manifest file in .TXT format was prepared as follows:
+
+`STUDY           PRJEB58046
+SAMPLE          ERS14471852
+ASSEMBLYNAME    Geodia_barretti_n_2022_12
+ASSEMBLY_TYPE   isolate
+COVERAGE        19
+PROGRAM         Flye
+PLATFORM        HiSeq X Ten, PacBio RS II, Sequel-4
+MINGAPLENGTH    100
+MOLECULETYPE    genomic DNA
+DESCRIPTION		'PacBio data was assembled with Flye using the ‘-meta’ flag (Kolmogorov et al. 2020) and polished with the short reads using Pilon (Walker et al. 2014). RNA sequencing data of the same specimen sequenced here and six other G. barretti individuals were used for identification of sponge contigs and gene annotation. These seven poly-A selected transcriptomes (bioproject: PRJNA603347, SRA: SRS6083072) include four individuals from the Norwegian and Barents Sea, sequenced with Scriptseqv2 (ROV6_3, trawl_5, trawl_6, trawl_8) and three individuals from Sweden sequenced with Trueseqv2 (Geodia_01 (UPSZMC 184975), Geodia_02 (UPSZMC 184976), Geodia_03 (UPSZMC 184977)) (Koutsouveli, Cárdenas, Conejero, et al. 2020). The transcriptomes were assembled using Trinity (Haas et al. 2013) with default parameters. To remove contamination (non-sponge contigs/scaffolds), these transcripts together with eukaryotic reference sequences from refseq (nt/nr) and UniProt were mapped against the polished assembly using gmap (Wu et al. 2016). Contigs with more than 20% coverage of either transcripts or refseq reads were retained. Coverage was calculated by mapping short and long reads to the genome with BWA (Li and Durbin 2009) and minimap2 (Li 2018) respectively. The depth of the resulting BAM files was extracted using samtools depth (Li et al. 2009) and the average and median across the coverage at all positions we calculated.'
+RUN_REF:		ERR10902930,ERR10857208,ERR10857206,ERR10857204,ERR10857202,ERR10857169
+FLATFILE:		geodia_barretti_n_genome_C.embl.gz`
+
+Where the `ASSEMBLYNAME` was provided by the DS referencing the organism, year, and month the assembly was to be submitted. Additional information for `COVERAGE`, `PROGRAM`, `MINGAPLENGTH`, and `DESCRIPTION` was provided by the researchers, where the information in the latter is a copy-paste from the article to be published. The files listed in `RUN_REF` are the accession numbers for the raw data reads previously submitted (# 5.2-5.4). 
+
+## 6.3 Submitting the Assemblies to ENA
+
+Executing the (now updated to v6.1.0) webin-cli client with the command:
+
+`java -jar webin-cli-6.1.0.jar -ascp -context=genome -manifest=manifest_nDNA_genome.txt -userName=[username] -password=[password] -validate`
+
+Running the above command resulted in multiple errors written to the [filename].report file, limited to the three categories (e.g.):
+
+  1. `ERROR: Invalid date: 15-DEC-2022 [ line: 9]`
+
+  2. `ERROR: Abutting features cannot be adjacent between neighbouring exons.`
+
+  3. `ERROR: "exon" Features locations are duplicated - consider merging qualifiers.`
+
+The first error (1.) was, after extensive troubleshooting, caused by the submitting DS laptop being set to Swedish system locale (sv_SE). Changing it to English (en_UK) by adding the java flags `-Duser.language=en` and `-Duser.country=UK` solved the issue:
+
+`java -jar -Duser.language=en -Duser.country=UK webin-cli-6.1.0.jar -ascp -context=genome -manifest=manifest_nDNA_genome.txt -userName=[username] -password=[password] -validate`
+
+The remaining errors (2. and 3.) also required extensive troubleshooting, but the solution was to modify the `translation_gff_attribute_to_embl_qualifier.json` and `translation_gff_feature_to_embl_feature.json` files located in the respective assembly folders by first running the command:
+
+`EMBLmyGFF3 --expose_translations`
+
+And then modifying `translation_gff_attribute_to_embl_qualifier.json` to the following:
+
+`"Dbxref": {
+   "source description": "A database cross reference.",
+   "target": "inference",
+   "dev comment": "inference"
+ },
+ "Ontology_term": {
+   "source description": "A cross reference to an ontology term.",
+   "target": "inference",
+   "dev comment": ""
+ },`
+ 
+ And in `translation_gff_feature_to_embl_feature.json` to:
+ 
+ `"exon": {
+    "remove": true
+},`
+
+After which the webin-cli was again executed with the command:
+
+`java -jar -Duser.language=en -Duser.country=UK webin-cli-6.1.0.jar -ascp -context=genome -manifest=manifest_nDNA_genome.txt -userName=[username] -password=[password] -validate`
+
+And after passed validation again with the `-submit` flag: 
+
+`java -jar -Duser.language=en -Duser.country=UK webin-cli-6.1.0.jar -ascp -context=genome -manifest=manifest_nDNA_genome.txt -userName=[username] -password=[password] -validate`
+
+In case the submission failed with a system error the same file was submitted again but without the `-ascp` flag.
+
+## 6.4 Mitochondrial assembly submisison
+
+The same thing was then repeated for the Mithochondrial genome with one exception. In an ENA submission the Mitochondria must be submitted as an organelle, which is treated as a chromosome in the submission. For webin-cli to submit the mithochondrial assembly an additional file must be referenced in the manifest:
+
+`STUDY           PRJEB58046
+SAMPLE          ERS14471852
+ASSEMBLYNAME    Geodia_barretti_mt_2020_01
+ASSEMBLY_TYPE   isolate
+COVERAGE        19
+PROGRAM         HGAP
+PLATFORM        HiSeq X Ten, PacBio RS II, Sequel-4
+MOLECULETYPE    genomic DNA
+DESCRIPTION		'PacBio data was assembled with Flye using the ‘-meta’ flag (Kolmogorov et al. 2020) and polished with the short reads using Pilon (Walker et al. 2014). RNA sequencing data of the same specimen sequenced here and six other G. barretti individuals were used for identification of sponge contigs and gene annotation. These seven poly-A selected transcriptomes (bioproject: PRJNA603347, SRA: SRS6083072) include four individuals from the Norwegian and Barents Sea, sequenced with Scriptseqv2 (ROV6_3, trawl_5, trawl_6, trawl_8) and three individuals from Sweden sequenced with Trueseqv2 (Geodia_01 (UPSZMC 184975), Geodia_02 (UPSZMC 184976), Geodia_03 (UPSZMC 184977)) (Koutsouveli, Cárdenas, Conejero, et al. 2020). The transcriptomes were assembled using Trinity (Haas et al. 2013) with default parameters. To remove contamination (non-sponge contigs/scaffolds), these transcripts together with eukaryotic reference sequences from refseq (nt/nr) and UniProt were mapped against the polished assembly using gmap (Wu et al. 2016). Contigs with more than 20% coverage of either transcripts or refseq reads were retained. Coverage was calculated by mapping short and long reads to the genome with BWA (Li and Durbin 2009) and minimap2 (Li 2018) respectively. The depth of the resulting BAM files was extracted using samtools depth (Li et al. 2009) and the average and median across the coverage at all positions we calculated.'
+RUN_REF:		ERR10902930,ERR10857208,ERR10857206,ERR10857204,ERR10857202,ERR10857169
+FLATFILE:		geodia_barretti_mt_genome.embl.gz
+CHROMOSOME_LIST: chromosome_list.txt.gz`
+
+The text file `chromosome_list.txt.gz` in this case contains a single line with the following information separated by tabs:
+
+`Gb1_v12	MIT Linear-Chromosome Mitochondrion`
+
+  - The value in the initial row `Gb1_v12` must be the same as referenced in the corresponding .EMBL flat file on the `AC *` line. 
+  - The second value `MIT` is a standard abbreviation of the Mitochondria in `CHROMOSOME_NAME` format
+  - The third value refers to the CHROMOSOME_TYPE input with an optional `Linear` modifier as the mitochondria is submitted as a linear sequence.
+  - The fourth value is optional and refers to the `CHROMOSOME_LOCATION` for which ENA has pre-defined values.
+
+Executing the command line:
+
+`java -jar -Duser.language=en -Duser.country=UK webin-cli-6.1.0.jar -context=genome -manifest=manifest_mtDNA_genome.txt -userName=[username] -password=[password] -validate`
+
+And after successful validation followed by:
+
+`java -jar -Duser.language=en -Duser.country=UK webin-cli-6.1.0.jar -context=genome -manifest=manifest_mtDNA_genome.txt -userName=[username] -password=[password] -submit`
+
+# 7 Post submission follow up
+
+After confirming successful submissions by loggin into ENA and checking that all submissions have been accepted, the raw data accession numbers toghether with the two annotated assembly accession numbers, were mailed to the researchers.
