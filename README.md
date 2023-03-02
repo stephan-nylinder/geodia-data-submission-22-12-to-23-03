@@ -27,7 +27,9 @@ First meeting between Data Steward (DS) and researchers on 2022-12-02 via Zoom. 
   - 2 files of HiSeqX reads in .FASTQ format (37.58G + 42.99G zipped)
 
   - 1 annotated nuclear assembly in .GFF format prepared for ENA by Bioinfomratician (351M unzipped)
+  - 1 corresponding nuclear genome .FASTA file (147M)
   - 1 annotated mitochondrial assembly in .GFF format prepared for ENA by researchers (8kb unzipped)
+  - 1 corresponding mitochondrial genome .FASTA file (18k)
 
 # 3. ENA account - Registration of project and study 
 
