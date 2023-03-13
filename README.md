@@ -52,11 +52,12 @@ To prepare the assembly data for submission, proper locus tags had to be decided
 
 The PacBio RSII .FASTQ file was downloaded from UPPMAX and verified. After verification the same file was gzipped using the command line with `-k` flag to retain the original file after zipping:
 
-`gzip -k pb_387_filtered_subreads.fastq > pb_387_filtered_subreads.fastq.gz`
+```gzip -k pb_387_filtered_subreads.fastq > pb_387_filtered_subreads.fastq.gz```
 
 A manifest file was first attempted in .JSON format, but the configuration of the file was difficult to figure out, and a change to simple .TXT format was made, naming the file `manifest_RSII.txt`. 
 
-`STUDY PRJEB58046
+```
+STUDY PRJEB58046
 SAMPLE ERS14471852
 NAME pb_387
 INSTRUMENT PacBio RS II
@@ -64,7 +65,8 @@ INSERT_SIZE 4500
 LIBRARY_SOURCE METAGENOMIC
 LIBRARY_SELECTION RANDOM
 LIBRARY_STRATEGY WGS
-FASTQ pb_387_filtered_subreads.fastq.gz`
+FASTQ pb_387_filtered_subreads.fastq.gz
+```
 
 Information for `INSTRUMENT` was taken from the ENA web help pages. Information for `INSERT SIZE`, `LIBRARY SOURCE`, `LIBRARY SELECTION`, and `LIBRARY STRATEGY` was provided by the researchers. Information for `NAME` was decided by DS in consultation with colleague. ENA website provided very few suggestions on format and what type of information `NAME` should allude to. It was eventually decided to let `NAME` reference the library name.
 
@@ -72,11 +74,11 @@ Information for `INSTRUMENT` was taken from the ENA web help pages. Information 
 
 Using the webin-cli client (version 5.2.0) the submission was first validated using the command line:
 
-`java -jar webin-cli-5.2.0.jar -context=reads -manifest=manifest_RSII.txt -userName=[username] -password=[password] -validate`
+```java -jar webin-cli-5.2.0.jar -context=reads -manifest=manifest_RSII.txt -userName=[username] -password=[password] -validate```
 
 After validation pass the command line was changed to: 
 
-`java -jar webin-cli-5.2.0.jar -context=reads -manifest=manifest_RSII.txt -userName=[username] -password=[password] -submit`
+```java -jar webin-cli-5.2.0.jar -context=reads -manifest=manifest_RSII.txt -userName=[username] -password=[password] -submit```
 
 A successful submission was verified by command line output.
 
@@ -84,7 +86,8 @@ A successful submission was verified by command line output.
 
 Sinilar to the previous submission of RSII reads (# 5.1 and # 5.2) the 4 .BAM files were downloaded from UPPMAX, validated, and zipped like above. A new manifest file was made in .TXT format (manifest_Sequel_reads.txt) as:
 
-`STUDY PRJEB58046
+```
+STUDY PRJEB58046
 SAMPLE ERS14471852
 NAME Sequel-4
 INSTRUMENT Sequel
@@ -92,7 +95,8 @@ INSERT_SIZE 7000
 LIBRARY_SOURCE METAGENOMIC
 LIBRARY_SELECTION RANDOM
 LIBRARY_STRATEGY WGS
-BAM m54032_171020_230022.subreads.bam`
+BAM m54032_171020_230022.subreads.bam
+```
 
 Specifications were provided as above, with the last line `BAM` changed to match each of the files, respectively. 
 
@@ -100,17 +104,18 @@ Specifications were provided as above, with the last line `BAM` changed to match
 
 Using the webin-cli client (version 5.2.0) the submission was first validated, as before, using the command line:
 
-`java -jar webin-cli-5.2.0.jar -context=reads -manifest=manifest_Sequel_reads.txt -userName=[username] -password=[password] -validate`
+```java -jar webin-cli-5.2.0.jar -context=reads -manifest=manifest_Sequel_reads.txt -userName=[username] -password=[password] -validate```
 
 After validation pass the command line was changed to:
 
-`java -jar webin-cli-5.2.0.jar -context=reads -manifest=manifest_Sequel_reads.txt -userName=[username] -password=[password] -submit`
+```java -jar webin-cli-5.2.0.jar -context=reads -manifest=manifest_Sequel_reads.txt -userName=[username] -password=[password] -submit```
 
 ## 5.4 Third submission round (HiSeqX reads)
 
 For the two larger HiSeqX files they were, just as before, downloaded from UPPMAX, validated, and zipped. THe manifest (manifest_HiSeqX.txt) was defined as:
 
-`STUDY PRJEB58046
+```
+STUDY PRJEB58046
 SAMPLE ERS14471852
 NAME HISEQ-RC-1780
 INSTRUMENT HiSeq X Ten
@@ -119,15 +124,16 @@ LIBRARY_SOURCE METAGENOMIC
 LIBRARY_SELECTION RANDOM
 LIBRARY_STRATEGY WGS
 FASTQ RC-1780-Geodia-barretti_S1_L001_R1_001.fastq.gz
-FASTQ RC-1780-Geodia-barretti_S1_L001_R2_001.fastq.gz`
+FASTQ RC-1780-Geodia-barretti_S1_L001_R2_001.fastq.gz
+```
 
 Using the webin-cli client (version 5.2.0) the submission was first validated, as before, using the command line:
 
-`java -jar webin-cli-5.2.0.jar -context=reads -manifest=manifest_HiSeqX.txt -userName=[username] -password=[password] -validate`
+```java -jar webin-cli-5.2.0.jar -context=reads -manifest=manifest_HiSeqX.txt -userName=[username] -password=[password] -validate```
 
 After validation pass the command line was changed to:
 
-`java -jar webin-cli-5.2.0.jar -context=reads -manifest=manifest_HiSeqX.txt -userName=[username] -password=[password] -submit`
+```java -jar webin-cli-5.2.0.jar -context=reads -manifest=manifest_HiSeqX.txt -userName=[username] -password=[password] -submit```
 
 However! Executing the command line resulted in a standy prompt, not seemingly gettting anywhere. Waiting for an extended time (1-6 hours) did not help. Any time the laptop was interrupted by energy save mode the file upload was terminated with an error message.
 
@@ -139,11 +145,11 @@ After consultation with DS colleagues the solution was to apply the IBM Aspera c
 
 Once the Apera client executed as excpected the final raw reads could eventually be uploaded to ENA (2023-02-15) with the command line:
 
-`java -jar webin-cli-5.2.0.jar -ascp -context=reads -manifest=manifest_HiSeqX.txt -userName=[username] -password=[password] -validate`
+```java -jar webin-cli-5.2.0.jar -ascp -context=reads -manifest=manifest_HiSeqX.txt -userName=[username] -password=[password] -validate```
 
 and
 
-`java -jar webin-cli-5.2.0.jar -ascp -context=reads -manifest=manifest_HiSeqX.txt -userName=[username] -password=[password] -submit`
+```java -jar webin-cli-5.2.0.jar -ascp -context=reads -manifest=manifest_HiSeqX.txt -userName=[username] -password=[password] -submit```
 
 > Note: It seems certain uploads in webin-cli using the Aspera flag results in failed file uploads due to system errors. In case this happens, try the same upload but witout the `-ascp` flag. 
 
@@ -170,7 +176,7 @@ For conversions to .EMBL flat file format the application requires two files:
 > Note: The .FASTA file header needs to correspond to the label on the .EMBL `AC * ` line.
 
 Conversion was done using the command line:
-`EMBLmyGFF3 -i GBAR -p [ENA project] -r 1 -s 'Geodia barretti' -t linear -m 'genomic DNA' [input ENA gff file].gff [fastq file].fa -o [output file].embl`
+```EMBLmyGFF3 -i GBAR -p [ENA project] -r 1 -s 'Geodia barretti' -t linear -m 'genomic DNA' [input ENA gff file].gff [fastq file].fa -o [output file].embl```
 
 THe resulting .EMBL flat file was then zipped as above. 
 
@@ -178,7 +184,8 @@ THe resulting .EMBL flat file was then zipped as above.
 
 A manifest file in .TXT format was prepared as follows:
 
-`STUDY           PRJEB58046
+```
+STUDY           PRJEB58046
 SAMPLE          ERS14471852
 ASSEMBLYNAME    Geodia_barretti_n_2022_12
 ASSEMBLY_TYPE   isolate
@@ -187,9 +194,10 @@ PROGRAM         Flye
 PLATFORM        HiSeq X Ten, PacBio RS II, Sequel-4
 MINGAPLENGTH    100
 MOLECULETYPE    genomic DNA
-DESCRIPTION		'PacBio data was assembled with Flye using the ‘-meta’ flag (Kolmogorov et al. 2020) and polished with the short reads using Pilon (Walker et al. 2014). RNA sequencing data of the same specimen sequenced here and six other G. barretti individuals were used for identification of sponge contigs and gene annotation. These seven poly-A selected transcriptomes (bioproject: PRJNA603347, SRA: SRS6083072) include four individuals from the Norwegian and Barents Sea, sequenced with Scriptseqv2 (ROV6_3, trawl_5, trawl_6, trawl_8) and three individuals from Sweden sequenced with Trueseqv2 (Geodia_01 (UPSZMC 184975), Geodia_02 (UPSZMC 184976), Geodia_03 (UPSZMC 184977)) (Koutsouveli, Cárdenas, Conejero, et al. 2020). The transcriptomes were assembled using Trinity (Haas et al. 2013) with default parameters. To remove contamination (non-sponge contigs/scaffolds), these transcripts together with eukaryotic reference sequences from refseq (nt/nr) and UniProt were mapped against the polished assembly using gmap (Wu et al. 2016). Contigs with more than 20% coverage of either transcripts or refseq reads were retained. Coverage was calculated by mapping short and long reads to the genome with BWA (Li and Durbin 2009) and minimap2 (Li 2018) respectively. The depth of the resulting BAM files was extracted using samtools depth (Li et al. 2009) and the average and median across the coverage at all positions we calculated.'
-RUN_REF:		ERR10902930,ERR10857208,ERR10857206,ERR10857204,ERR10857202,ERR10857169
-FLATFILE:		geodia_barretti_n_genome_C.embl.gz`
+DESCRIPTION     'PacBio data was assembled with Flye using the ‘-meta’ flag (Kolmogorov et al. 2020) and polished with the short reads using Pilon (Walker et al. 2014). RNA sequencing data of the same specimen sequenced here and six other G. barretti individuals were used for identification of sponge contigs and gene annotation. These seven poly-A selected transcriptomes (bioproject: PRJNA603347, SRA: SRS6083072) include four individuals from the Norwegian and Barents Sea, sequenced with Scriptseqv2 (ROV6_3, trawl_5, trawl_6, trawl_8) and three individuals from Sweden sequenced with Trueseqv2 (Geodia_01 (UPSZMC 184975), Geodia_02 (UPSZMC 184976), Geodia_03 (UPSZMC 184977)) (Koutsouveli, Cárdenas, Conejero, et al. 2020). The transcriptomes were assembled using Trinity (Haas et al. 2013) with default parameters. To remove contamination (non-sponge contigs/scaffolds), these transcripts together with eukaryotic reference sequences from refseq (nt/nr) and UniProt were mapped against the polished assembly using gmap (Wu et al. 2016). Contigs with more than 20% coverage of either transcripts or refseq reads were retained. Coverage was calculated by mapping short and long reads to the genome with BWA (Li and Durbin 2009) and minimap2 (Li 2018) respectively. The depth of the resulting BAM files was extracted using samtools depth (Li et al. 2009) and the average and median across the coverage at all positions we calculated.'
+RUN_REF:        ERR10902930,ERR10857208,ERR10857206,ERR10857204,ERR10857202,ERR10857169
+FLATFILE:       geodia_barretti_n_genome_C.embl.gz
+```
 
 Where the `ASSEMBLYNAME` was provided by the DS referencing the organism, year, and month the assembly was to be submitted. Additional information for `COVERAGE`, `PROGRAM`, `MINGAPLENGTH`, and `DESCRIPTION` was provided by the researchers, where the information in the latter is a copy-paste from the article to be published. The files listed in `RUN_REF` are the accession numbers for the raw data reads previously submitted (# 5.2-5.4). 
 
@@ -197,7 +205,7 @@ Where the `ASSEMBLYNAME` was provided by the DS referencing the organism, year, 
 
 Executing the (now updated to v6.1.0) webin-cli client with the command:
 
-`java -jar webin-cli-6.1.0.jar -ascp -context=genome -manifest=manifest_nDNA_genome.txt -userName=[username] -password=[password] -validate`
+```java -jar webin-cli-6.1.0.jar -ascp -context=genome -manifest=manifest_nDNA_genome.txt -userName=[username] -password=[password] -validate```
 
 Running the above command resulted in multiple errors written to the [filename].report file, limited to the three categories (e.g.):
 
@@ -209,7 +217,7 @@ Running the above command resulted in multiple errors written to the [filename].
 
 The first error (1.) was, after extensive troubleshooting, caused by the submitting DS laptop being set to Swedish system locale (sv_SE). Changing it to English (en_UK) by adding the java flags `-Duser.language=en` and `-Duser.country=UK` solved the issue:
 
-`java -jar -Duser.language=en -Duser.country=UK webin-cli-6.1.0.jar -ascp -context=genome -manifest=manifest_nDNA_genome.txt -userName=[username] -password=[password] -validate`
+```java -jar -Duser.language=en -Duser.country=UK webin-cli-6.1.0.jar -ascp -context=genome -manifest=manifest_nDNA_genome.txt -userName=[username] -password=[password] -validate```
 
 The remaining errors (2. and 3.) also required extensive troubleshooting, but the solution was to modify the `translation_gff_attribute_to_embl_qualifier.json` and `translation_gff_feature_to_embl_feature.json` files located in the respective assembly folders by first running the command:
 
@@ -217,7 +225,8 @@ The remaining errors (2. and 3.) also required extensive troubleshooting, but th
 
 And then modifying `translation_gff_attribute_to_embl_qualifier.json` to the following:
 
-`"Dbxref": {
+```
+"Dbxref": {
    "source description": "A database cross reference.",
    "target": "inference",
    "dev comment": "inference"
@@ -226,21 +235,24 @@ And then modifying `translation_gff_attribute_to_embl_qualifier.json` to the fol
    "source description": "A cross reference to an ontology term.",
    "target": "inference",
    "dev comment": ""
- },`
+ },
+ ```
  
  And in `translation_gff_feature_to_embl_feature.json` to:
  
- `"exon": {
+```
+ '"exon": {
     "remove": true
-},`
+},
+```
 
 After which the webin-cli was again executed with the command:
 
-`java -jar -Duser.language=en -Duser.country=UK webin-cli-6.1.0.jar -ascp -context=genome -manifest=manifest_nDNA_genome.txt -userName=[username] -password=[password] -validate`
+```java -jar -Duser.language=en -Duser.country=UK webin-cli-6.1.0.jar -ascp -context=genome -manifest=manifest_nDNA_genome.txt -userName=[username] -password=[password] -validate```
 
 And after passed validation again with the `-submit` flag: 
 
-`java -jar -Duser.language=en -Duser.country=UK webin-cli-6.1.0.jar -ascp -context=genome -manifest=manifest_nDNA_genome.txt -userName=[username] -password=[password] -validate`
+```java -jar -Duser.language=en -Duser.country=UK webin-cli-6.1.0.jar -ascp -context=genome -manifest=manifest_nDNA_genome.txt -userName=[username] -password=[password] -validate```
 
 In case the submission failed with a system error the same file was submitted again but without the `-ascp` flag.
 
@@ -248,7 +260,8 @@ In case the submission failed with a system error the same file was submitted ag
 
 The same thing was then repeated for the Mithochondrial genome with one exception. In an ENA submission the Mitochondria must be submitted as an organelle, which is treated as a chromosome in the submission. For webin-cli to submit the mithochondrial assembly an additional file must be referenced in the manifest:
 
-`STUDY           PRJEB58046
+```
+STUDY           PRJEB58046
 SAMPLE          ERS14471852
 ASSEMBLYNAME    Geodia_barretti_mt_2020_01
 ASSEMBLY_TYPE   isolate
@@ -256,10 +269,11 @@ COVERAGE        19
 PROGRAM         HGAP
 PLATFORM        HiSeq X Ten, PacBio RS II, Sequel-4
 MOLECULETYPE    genomic DNA
-DESCRIPTION		'PacBio data was assembled with Flye using the ‘-meta’ flag (Kolmogorov et al. 2020) and polished with the short reads using Pilon (Walker et al. 2014). RNA sequencing data of the same specimen sequenced here and six other G. barretti individuals were used for identification of sponge contigs and gene annotation. These seven poly-A selected transcriptomes (bioproject: PRJNA603347, SRA: SRS6083072) include four individuals from the Norwegian and Barents Sea, sequenced with Scriptseqv2 (ROV6_3, trawl_5, trawl_6, trawl_8) and three individuals from Sweden sequenced with Trueseqv2 (Geodia_01 (UPSZMC 184975), Geodia_02 (UPSZMC 184976), Geodia_03 (UPSZMC 184977)) (Koutsouveli, Cárdenas, Conejero, et al. 2020). The transcriptomes were assembled using Trinity (Haas et al. 2013) with default parameters. To remove contamination (non-sponge contigs/scaffolds), these transcripts together with eukaryotic reference sequences from refseq (nt/nr) and UniProt were mapped against the polished assembly using gmap (Wu et al. 2016). Contigs with more than 20% coverage of either transcripts or refseq reads were retained. Coverage was calculated by mapping short and long reads to the genome with BWA (Li and Durbin 2009) and minimap2 (Li 2018) respectively. The depth of the resulting BAM files was extracted using samtools depth (Li et al. 2009) and the average and median across the coverage at all positions we calculated.'
-RUN_REF:		ERR10902930,ERR10857208,ERR10857206,ERR10857204,ERR10857202,ERR10857169
-FLATFILE:		geodia_barretti_mt_genome.embl.gz
-CHROMOSOME_LIST: chromosome_list.txt.gz`
+DESCRIPTION     'PacBio data was assembled with Flye using the ‘-meta’ flag (Kolmogorov et al. 2020) and polished with the short reads using Pilon (Walker et al. 2014). RNA sequencing data of the same specimen sequenced here and six other G. barretti individuals were used for identification of sponge contigs and gene annotation. These seven poly-A selected transcriptomes (bioproject: PRJNA603347, SRA: SRS6083072) include four individuals from the Norwegian and Barents Sea, sequenced with Scriptseqv2 (ROV6_3, trawl_5, trawl_6, trawl_8) and three individuals from Sweden sequenced with Trueseqv2 (Geodia_01 (UPSZMC 184975), Geodia_02 (UPSZMC 184976), Geodia_03 (UPSZMC 184977)) (Koutsouveli, Cárdenas, Conejero, et al. 2020). The transcriptomes were assembled using Trinity (Haas et al. 2013) with default parameters. To remove contamination (non-sponge contigs/scaffolds), these transcripts together with eukaryotic reference sequences from refseq (nt/nr) and UniProt were mapped against the polished assembly using gmap (Wu et al. 2016). Contigs with more than 20% coverage of either transcripts or refseq reads were retained. Coverage was calculated by mapping short and long reads to the genome with BWA (Li and Durbin 2009) and minimap2 (Li 2018) respectively. The depth of the resulting BAM files was extracted using samtools depth (Li et al. 2009) and the average and median across the coverage at all positions we calculated.'
+RUN_REF:        ERR10902930,ERR10857208,ERR10857206,ERR10857204,ERR10857202,ERR10857169
+FLATFILE:       geodia_barretti_mt_genome.embl.gz
+CHROMOSOME_LIST: chromosome_list.txt.gz
+```
 
 The text file `chromosome_list.txt.gz` in this case contains a single line with the following information separated by tabs:
 
@@ -272,12 +286,12 @@ The text file `chromosome_list.txt.gz` in this case contains a single line with 
 
 Executing the command line:
 
-`java -jar -Duser.language=en -Duser.country=UK webin-cli-6.1.0.jar -context=genome -manifest=manifest_mtDNA_genome.txt -userName=[username] -password=[password] -validate`
+```java -jar -Duser.language=en -Duser.country=UK webin-cli-6.1.0.jar -context=genome -manifest=manifest_mtDNA_genome.txt -userName=[username] -password=[password] -validate```
 
 And after successful validation followed by:
 
-`java -jar -Duser.language=en -Duser.country=UK webin-cli-6.1.0.jar -context=genome -manifest=manifest_mtDNA_genome.txt -userName=[username] -password=[password] -submit`
+```java -jar -Duser.language=en -Duser.country=UK webin-cli-6.1.0.jar -context=genome -manifest=manifest_mtDNA_genome.txt -userName=[username] -password=[password] -submit```
 
 # 7 Post submission follow up
 
-After confirming successful submissions by loggin into ENA and checking that all submissions have been accepted, the raw data accession numbers toghether with the two annotated assembly accession numbers, were mailed to the researchers.
+After confirming successful submissions by loggin into ENA and checking that all submissions have been accepted, the raw data accession numbers toghether with the two annotated assembly accession numbers, were mailed to the researchers. Confirmation of received accession numbers effectively closed the issue on 2022-03-02.
