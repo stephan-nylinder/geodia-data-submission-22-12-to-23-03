@@ -294,4 +294,4 @@ And after successful validation followed by:
 
 # 7 Post submission follow up
 
-After confirming successful submissions by loggin into ENA and checking that all submissions have been accepted, the raw data accession numbers toghether with the two annotated assembly accession numbers, were mailed to the researchers. Confirmation of received accession numbers effectively closed the issue on 2022-03-02.
+After confirming successful submissions by loggin into ENA and checking that all submissions have been accepted, the raw data accession numbers toghether with the two annotated assembly accession numbers, were mailed to the researchers. Confirmation of received accession numbers effectively closed the issue on 2023-03-02.
